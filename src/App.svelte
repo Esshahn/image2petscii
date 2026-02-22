@@ -15,7 +15,6 @@
   let extractedPalette = $state<RGB[] | null>(null);
   let bgColorIndex = $state(0);
   let contrastValue = $state(8);
-  let ditherRes = $state(1);
   let ditherMethod = $state<DitherMethod>("threshold");
   let levelsBlack = $state(0);
   let levelsWhite = $state(255);
@@ -39,7 +38,7 @@
   let ditherSettings: DitherSettings = $derived({
     method: ditherMethod,
     contrast: contrastValue,
-    resolution: ditherRes,
+    resolution: 1,
     blackPoint: levelsBlack,
     whitePoint: levelsWhite,
     gamma: levelsGamma,
@@ -281,17 +280,6 @@
         />
       </div>
 
-      <div class="control-group">
-        <span class="label">Resolution: {ditherRes}x</span>
-        <input
-          type="range"
-          min="1"
-          max="8"
-          step="1"
-          bind:value={ditherRes}
-          oninput={updateDither}
-        />
-      </div>
     </div>
 
     <div class="controls-row">
