@@ -1,47 +1,61 @@
-# Svelte + TS + Vite
+# PETSCII Converter
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+A web-based tool that converts images into PETSCII art using the Commodore 64 character set and color palette.
 
-## Recommended IDE Setup
+## Features
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+- **Image import** via drag & drop or file picker
+- **Multiple dithering algorithms**: Floyd-Steinberg, Atkinson, Jarvis-Judice-Ninke, Stucki, Threshold
+- **Levels adjustment**: black point, white point, gamma controls
+- **Contrast and resolution** controls for fine-tuning the dither
+- **3 built-in C64 palettes**: Colodore, PALette, Pepto
+- **Auto palette extraction**: detects colors directly from the input image and maps them to C64 color indices
+- **Per-color and per-character exclusion**: click to include/exclude individual colors or PETSCII characters
+- **Selectable background color**
+- **PNG export** of the converted output
 
-## Need an official Svelte framework?
+## Getting Started
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
-
-## Technical considerations
-
-**Why use this over SvelteKit?**
-
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
-
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
-
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
-
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
-
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
-
-**Why include `.vscode/extensions.json`?**
-
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `allowJs` in the TS template?**
-
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+```bash
+npm install
+npm run dev
 ```
+
+Open `http://localhost:5173` in your browser.
+
+## Build
+
+```bash
+npm run build
+npm run preview
+```
+
+## How It Works
+
+1. **Dithering**: The source image is scaled to C64 resolution (320x200), converted to luminance, and dithered to a black/white bitmap using the selected algorithm.
+2. **Character matching**: Each 8x8 block of the bitmap is matched against the C64 charset (256 characters) using Hamming distance. Both normal and inverted polarities are evaluated.
+3. **Color matching**: For each matched character, foreground color is determined by per-pixel majority voting against the selected palette.
+4. **Rendering**: The result is rendered to a canvas using the matched characters and colors.
+
+## Project Structure
+
+```
+src/
+  App.svelte          — Main UI (Svelte 5 with runes)
+  main.ts             — App entry point
+  app.css             — Global styles
+  lib/
+    converter.ts      — Dithering, character matching, color matching, palette extraction
+    charset.ts        — C64 charset PNG parser (8x8 bitmaps)
+    colors.ts         — Color utilities (hex conversion, palette loading)
+    renderer.ts       — Canvas rendering and PNG export
+public/
+  c64-charset.png     — 128x128 C64 character set (16x16 grid of 8x8 chars)
+  palette.json        — C64 color palettes (Colodore, PALette, Pepto)
+```
+
+## Tech Stack
+
+- [Svelte 5](https://svelte.dev/) with runes (`$state`, `$derived`, `$effect`)
+- [Vite](https://vite.dev/)
+- TypeScript
